@@ -26,6 +26,12 @@ io.on('connect', (socket) => {
 
     callback();
   });
+
+  socket.on('disconnect', () => {
+    const user = removeUser(socket.id);
+    io.on(user.room).emit('message', { user: 'admin', text: `${user.name} has left the room` });
+    io.on(user.room).emit('roomData', {room: user.room, users: getUsersInRoom(user.room)})
+  });
 });
 
 server.listen(process.env.PORT || 5000, () => console.log('Server has started'));
