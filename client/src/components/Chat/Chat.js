@@ -1,10 +1,41 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import queryString from 'query-string';
+import io from "socket.io-client";
+
+import InfoBar from '../InfoBar/InfoBar';
 
 import './Chat.css';
 
-const Chat = () => {
+const ENDPOINT = 'localhost:3000';
+
+let socket;
+
+const Chat = ({ location }) => {
+  const [name, setName] = useState('');
+  const [room, setRoom] = useState('');
+  const [users, setUsers] = useState([]);
+  const [message, setMessage] = useState('');
+  const [messages, setMessages] = useState('');
+
+  useEffect(() => {
+    const { name, room } = queryString.parse(location.search);
+
+    socket = io(ENDPOINT);
+
+    setName(name);
+    setRoom(room);
+
+    socket.emit('join', { name, room }, (error) => {
+      if(error) alert(error);
+    });
+  },[location.search]);
+
   return(
-    <h1>Chat</h1>
+    <div className="outerContainer">
+      <div className="container">
+        <h1>Chat</h1>
+      </div>
+    </div>
   );
 }
 
